@@ -1,0 +1,28 @@
+# Environment
+.env
+*.json
+
+# Session artifacts
+sessions/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Generated output
+graphify-out/
+.benchmarks/
+.pytest_cache/
+
+# Images
+*.png
+*.jpg
+*.jpeg

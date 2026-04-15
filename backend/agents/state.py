@@ -12,6 +12,7 @@ class AgentState(TypedDict):
     chart_paths: list[str]          # PNGs saved by EDA Agent (accumulates across rounds)
     eda_results: dict               # structured JSON output from EDA Agent
     sql_summaries: list[str]        # text summaries returned by SQL Agent (accumulates)
+    csv_schemas: list[dict]         # per-CSV metadata: {filename, columns, dtypes, row_count}
     eda_code: list[str]             # code blocks executed by EDA Agent
     eda_inferences: list[str]       # per-round EDA narrative texts (accumulates)
     iteration: int                  # legacy refinement counter

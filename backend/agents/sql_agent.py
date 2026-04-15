@@ -90,6 +90,7 @@ def _run_query(query: str, session_dir: str) -> dict:
         "csv_path": csv_path,
         "row_count": len(df),
         "columns": list(df.columns),
+        "dtypes": df.dtypes.astype(str).to_dict(),
         "preview": df.head(5).to_string(index=False),
         "error": None,
     }
@@ -181,6 +182,7 @@ def sql_agent_node(state: AgentState) -> dict:
 
     csv_paths = list(state.get("csv_paths", []))
     sql_summaries = list(state.get("sql_summaries", []))
+    csv_schemas = list(state.get("csv_schemas", []))
 
     if result.get("error"):
         log.error(f"SQL Agent failed after {attempts} attempts. Last error: {result['error']}")
@@ -198,6 +200,12 @@ def sql_agent_node(state: AgentState) -> dict:
             f"Preview:\n{result['preview']}"
         )
         sql_summaries.append(summary)
+        csv_schemas.append({
+            "filename": os.path.basename(result["csv_path"]),
+            "columns": result["columns"],
+            "dtypes": result.get("dtypes", {}),
+            "row_count": result["row_count"],
+        })
 
     return {
         "messages": [
@@ -205,5 +213,6 @@ def sql_agent_node(state: AgentState) -> dict:
         ],
         "csv_paths": csv_paths,
         "sql_summaries": sql_summaries,
+        "csv_schemas": csv_schemas,
         "iteration": state.get("iteration", 0) + 1,
     }

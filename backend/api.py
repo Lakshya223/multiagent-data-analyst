@@ -181,6 +181,7 @@ def analyze(req: AnalyzeRequest):
             "agent_call_count": 0,
             "hypothesis_data_request": "",
             "eda_inferences": [],
+            "csv_schemas": [],
             **session,
         }
 

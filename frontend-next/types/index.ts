@@ -61,7 +61,7 @@ export interface ResultEntry {
   result: AnalysisResult;
 }
 
-export type AppPhase = 'landing' | 'instructor_options' | 'tour' | 'app'
+export type AppPhase = 'landing' | 'instructor_options' | 'welcome' | 'tour' | 'app'
 
 export interface TourStep {
   target: string
@@ -94,5 +94,10 @@ export const TOUR_STEPS: TourStep[] = [
     target: 'tab-bar',
     title: 'Switch between views',
     description: 'Toggle between Findings, Analysis, and Data tabs to explore results.',
+  },
+  {
+    target: 'schema-button',
+    title: 'Explore the database schema',
+    description: 'Not sure what to ask? Click Schema to browse all available tables, columns, and data descriptions before writing your first question.',
   },
 ]

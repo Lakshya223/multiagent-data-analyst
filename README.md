@@ -10,7 +10,7 @@ An agentic AI system that autonomously queries a large retail BigQuery dataset, 
 
 ## What It Does
 
-A user types a business question such as *"Which email campaigns drove the most purchases?"* The system:
+A user types a business question such as *"What are the top product categories by revenue?"* The system:
 
 1. **Collects** — writes and executes BigQuery SQL to retrieve relevant rows from up to three tables
 2. **Explores** — runs Python (pandas, matplotlib, plotly) on the retrieved data to compute statistics, correlations, and time-series trends, producing charts

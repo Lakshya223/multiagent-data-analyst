@@ -9,6 +9,7 @@ import ResultsPanel from "@/components/results/ResultsPanel";
 import RoleSelection from "@/components/onboarding/RoleSelection";
 import InstructorOptions from "@/components/onboarding/InstructorOptions";
 import InstructorView from "@/components/onboarding/InstructorView";
+import WelcomeModal from "@/components/onboarding/WelcomeModal";
 import TourOverlay from "@/components/onboarding/TourOverlay";
 
 const MIN_CHAT_WIDTH = 280;
@@ -57,8 +58,8 @@ export default function Home() {
   }, []);
 
   const handleVisitor = useCallback(() => {
-    startTour();
-  }, [startTour]);
+    setAppPhase("welcome");
+  }, []);
 
   const handleVeteran = useCallback(() => {
     setAppPhase("app");
@@ -113,6 +114,11 @@ export default function Home() {
         <div className="fixed inset-0 z-40 bg-white">
           <RoleSelection onInstructor={handleInstructor} onVisitor={handleVisitor} onVeteran={handleVeteran} />
         </div>
+      )}
+
+      {/* ── Welcome modal — shown before tour ── */}
+      {appPhase === "welcome" && (
+        <WelcomeModal onStart={startTour} />
       )}
 
       {/* ── Instructor options — flip scene ── */}

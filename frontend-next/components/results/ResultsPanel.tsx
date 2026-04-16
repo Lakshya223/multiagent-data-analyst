@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { AnalysisResult, AppStatus, AGENT_LABELS } from "@/types";
+import { AnalysisResult, AppStatus, AGENT_LABELS, ResultEntry, ChatMessage } from "@/types";
 import TabBar from "./TabBar";
 import FindingsTab from "./FindingsTab";
 import AnalysisTab from "./AnalysisTab";
@@ -15,11 +15,15 @@ export default function ResultsPanel({
   status,
   onSelect,
   onReset,
+  resultHistory,
+  messages,
 }: {
   result: AnalysisResult | null;
   status: AppStatus;
   onSelect: (q: string) => void;
   onReset?: () => void;
+  resultHistory?: ResultEntry[];
+  messages?: ChatMessage[];
 }) {
   const [activeTab, setActiveTab] = useState<Tab>("findings");
   const isProcessing = status.state === "processing";
@@ -27,7 +31,7 @@ export default function ResultsPanel({
   if (!result) {
     return (
       <div className="flex-1 flex flex-col h-full bg-white">
-        <TabBar active={activeTab} onChange={setActiveTab} />
+        <TabBar active={activeTab} onChange={setActiveTab} resultHistory={resultHistory} messages={messages} />
         {isProcessing ? (
           <ProcessingState agent={status.agent} />
         ) : (
@@ -39,7 +43,7 @@ export default function ResultsPanel({
 
   return (
     <div className="flex-1 flex flex-col h-full bg-white overflow-hidden">
-      <TabBar active={activeTab} onChange={setActiveTab} onReset={onReset} />
+      <TabBar active={activeTab} onChange={setActiveTab} onReset={onReset} resultHistory={resultHistory} messages={messages} />
 
       {/* Thin pulsing banner shown while a new query is processing */}
       {isProcessing && (

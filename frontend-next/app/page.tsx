@@ -17,7 +17,7 @@ const MAX_CHAT_WIDTH = 900;
 const DEFAULT_CHAT_WIDTH = 420; // SSR-safe fallback
 
 export default function Home() {
-  const { messages, currentResult, status, analyze, reset, selectResult, resultIds, selectedId } = useAnalysis();
+  const { messages, currentResult, resultHistory, status, analyze, reset, selectResult, resultIds, selectedId } = useAnalysis();
   const [chatWidth, setChatWidth] = useState(DEFAULT_CHAT_WIDTH);
   const [isAnimatingWidth, setIsAnimatingWidth] = useState(false);
   const hasAutoSlid = useRef(false);
@@ -194,6 +194,8 @@ export default function Home() {
             status={status}
             onSelect={analyze}
             onReset={currentResult ? reset : undefined}
+            resultHistory={resultHistory}
+            messages={messages}
           />
         </div>
       </div>

@@ -143,5 +143,5 @@ export function useAnalysis() {
     setConversationHistory([]);
   }, []);
 
-  return { messages, currentResult, status, analyze, reset, selectResult, resultIds, selectedId };
+  return { messages, currentResult, resultHistory, status, analyze, reset, selectResult, resultIds, selectedId };
 }

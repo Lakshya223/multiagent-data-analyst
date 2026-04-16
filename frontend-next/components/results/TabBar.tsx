@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import SchemaModal from "@/components/ui/SchemaModal";
+import ReportModal from "@/components/ui/ReportModal";
+import { ResultEntry, ChatMessage } from "@/types";
 
 type Tab = "findings" | "analysis" | "data";
 
@@ -8,12 +10,18 @@ export default function TabBar({
   active,
   onChange,
   onReset,
+  resultHistory,
+  messages,
 }: {
   active: Tab;
   onChange: (t: Tab) => void;
   onReset?: () => void;
+  resultHistory?: ResultEntry[];
+  messages?: ChatMessage[];
 }) {
   const [showSchema, setShowSchema] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const hasResults = (resultHistory?.length ?? 0) > 0;
 
   const tabs: { id: Tab; label: string }[] = [
     { id: "findings", label: "Findings" },
@@ -41,7 +49,7 @@ export default function TabBar({
           ))}
         </div>
 
-        {/* Right — Schema + New Session */}
+        {/* Right — Schema + Report + New Session */}
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowSchema(true)}
@@ -56,6 +64,21 @@ export default function TabBar({
             </svg>
             Schema
           </button>
+
+          {hasResults && (
+            <button
+              onClick={() => setShowReport(true)}
+              className="flex items-center gap-1.5 text-xs text-indigo-500 hover:text-indigo-700 border border-indigo-200 hover:border-indigo-400 rounded-lg px-3 py-1.5 transition-colors"
+              title="Generate session report"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Report
+            </button>
+          )}
 
           {onReset && (
             <button
@@ -74,6 +97,13 @@ export default function TabBar({
       </div>
 
       {showSchema && <SchemaModal onClose={() => setShowSchema(false)} />}
+      {showReport && resultHistory && messages && (
+        <ReportModal
+          onClose={() => setShowReport(false)}
+          resultHistory={resultHistory}
+          messages={messages}
+        />
+      )}
     </>
   );
 }

@@ -75,8 +75,8 @@ export default function Home() {
   }, []);
 
   const handleInstructorContinue = useCallback(() => {
-    startTour();
-  }, [startTour]);
+    setAppPhase("welcome");
+  }, []);
 
   // ── Drag-to-resize divider ─────────────────────────────
   const onDividerMouseDown = useCallback(

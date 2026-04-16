@@ -10,7 +10,7 @@ const TABLES = [
     range: "Jan 1 – Jul 30, 2025",
     color: "bg-blue-50 text-blue-700 border-blue-200",
     dot: "bg-blue-400",
-    description: "Order and item-level purchase data from Saks OFF 5TH stores and online channels.",
+    description: "Order and item-level purchase data from Velora stores and online channels.",
     columns: [
       { name: "AMPERITY_ID", type: "STRING", desc: "Unique customer UUID" },
       { name: "ORDER_ID", type: "STRING", desc: "Unique hashed order identifier" },
@@ -22,8 +22,8 @@ const TABLES = [
       { name: "ITEM_DISCOUNT_PERCENT", type: "FLOAT", desc: "Discount % (e.g. 0.40 = 40%)" },
       { name: "IS_RETURN", type: "BOOLEAN", desc: "TRUE if this line item was returned" },
       { name: "IS_CANCELLATION", type: "BOOLEAN", desc: "TRUE if this line item was cancelled" },
-      { name: "PURCHASE_CHANNEL", type: "STRING", desc: "Channel (e.g. SOF = Saks OFF 5TH)" },
-      { name: "PURCHASE_BRAND", type: "STRING", desc: "Brand banner (SAKSOFFFIFTH, SOF)" },
+      { name: "PURCHASE_CHANNEL", type: "STRING", desc: "Channel through which the purchase was made — probe values before filtering" },
+      { name: "PURCHASE_BRAND", type: "STRING", desc: "Brand banner where the purchase was made — probe values before filtering" },
       { name: "PAYMENT_METHOD", type: "STRING", desc: "MASTERCARD, VISA, DEBIT CARD, etc." },
       { name: "STORE_ID", type: "INTEGER", desc: "Physical store identifier" },
       { name: "STORE_NAME", type: "STRING", desc: "Store location name (e.g. ANAHEIM O5)" },
@@ -102,7 +102,7 @@ const TABLES = [
       { name: "REF_SEGMENT", type: "STRING", desc: "Audience segment targeted (MCRO, FULLNP, FULL)" },
       { name: "REF_LOYALTY", type: "STRING", desc: "Loyalty tier targeted (NLOY = non-loyalty)" },
       { name: "REF_CATEGORY", type: "STRING", desc: "Category code for the campaign" },
-      { name: "FROMNAME", type: "STRING", desc: "Sender display name (e.g. Saks OFF 5TH)" },
+      { name: "FROMNAME", type: "STRING", desc: "Sender display name (e.g. Velora)" },
       { name: "PUB_DATE", type: "INTEGER", desc: "Publication date in MMDDYY format" },
     ],
     notes: [

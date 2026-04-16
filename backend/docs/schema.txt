@@ -25,8 +25,8 @@ AVAILABLE TABLES
    CURRENCY                STRING      Currency of the transaction (e.g. USD)
    PAYMENT_METHOD          STRING      Payment method used (e.g. MASTERCARD, VISA, DEBIT CARD, AMERICAN EXPRESS)
    PAYMENT_REFERENCE2      STRING      Secondary payment reference identifier (null in sample)
-   PURCHASE_CHANNEL        STRING      Channel through which the purchase was made (e.g. SOF = Saks OFF 5TH — probe before filtering)
-   PURCHASE_BRAND          STRING      Brand banner where purchase was made (e.g. SAKSOFFFIFTH, SOF)
+   PURCHASE_CHANNEL        STRING      Channel through which the purchase was made — probe values before filtering
+   PURCHASE_BRAND          STRING      Brand banner where purchase was made — probe values before filtering
    DELIVERY_METHOD         STRING      How the order was fulfilled (e.g. ship, pickup — null in sample, probe before filtering)
    DIGITAL_CHANNEL         STRING      Digital sub-channel if order placed online (null in sample)
    ORDER_STATUS            STRING      Current status of the order (null in sample — probe before filtering)
@@ -139,7 +139,7 @@ AVAILABLE TABLES
    SUBJECT                     STRING      Email subject line shown to recipient
    SUBJ_LEN                    INTEGER     Character length of the subject line
    SUB_WORD_COUNT              INTEGER     Word count of the subject line
-   FROMNAME                    STRING      Sender display name (e.g. Saks OFF 5TH)
+   FROMNAME                    STRING      Sender display name (e.g. Velora)
    FROMEMAIL                   STRING      Sender email address
    SJ_JOBSTATUS                STRING      Send job status (e.g. Complete)
    SENT_TIME                   TIMESTAMP   UTC timestamp when email was sent

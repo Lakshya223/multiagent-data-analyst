@@ -97,15 +97,22 @@ The system uses a **LangGraph `StateGraph`** with a central supervisor that dyna
 
 | Agent | Role |
 |---|---|
-| **Supervisor** | Reads full session state and routes to the next agent. Uses Gemini 2.0 Flash to decide dynamically — no fixed pipeline. |
+| **Supervisor** | Reads full session state and routes to the next agent. Uses the user-selected model (Gemini 2.0 Flash or Gemini 2.5 Pro) to decide dynamically — no fixed pipeline. |
 | **SQL Agent** | Writes a BigQuery SQL query from the user question + full schema context, executes it, saves results as CSV, returns a text summary. Can be called multiple times per question. |
 | **EDA Agent** | Writes and executes Python (pandas, matplotlib, plotly) in a sandboxed `exec()` environment on the latest CSV. Generates charts (PNG), computes statistics, and produces per-round and per-chart narrative inferences. |
 | **Hypothesis Agent** | Reads all SQL summaries and EDA inferences, checks data sufficiency, and synthesizes a structured markdown report: Summary → Hypotheses → Data Evidence → Recommendations. If data is insufficient, signals the supervisor for another data collection round. |
 | **Fallback Agent** | Handles greetings, conversational messages, questions about conversation history, and off-topic requests. Has access to the full conversation history to answer memory-recall questions. |
 
-### LLM: Gemini 2.0 Flash (via Vertex AI)
+### LLM: Gemini 2.0 Flash & Gemini 2.5 Pro (via Vertex AI)
 
-All agents use `gemini-2.0-flash` at `temperature=0` for deterministic, reproducible outputs.
+Two models are available and selectable from the chat input:
+
+| Model | ID | Best for |
+|---|---|---|
+| **Gemini 2.0 Flash** | `gemini-2.0-flash` | Fast answers, ideal for most questions |
+| **Gemini 2.5 Pro** | `gemini-2.5-pro` | Complex analysis and deeper reasoning |
+
+All agents run at `temperature=0` for deterministic, reproducible outputs.
 
 ### Multi-Agent Patterns Used
 
@@ -178,7 +185,7 @@ The **Hypothesis Agent** synthesizes all evidence:
 
 | Layer | Technology |
 |---|---|
-| LLM | Gemini 2.0 Flash via Vertex AI (`langchain-google-vertexai`) |
+| LLM | Gemini 2.0 Flash & Gemini 2.5 Pro via Vertex AI (`langchain-google-vertexai`) |
 | Agent framework | LangGraph (`StateGraph`) |
 | Data store | Google BigQuery |
 | Artifact store | Google Cloud Storage |

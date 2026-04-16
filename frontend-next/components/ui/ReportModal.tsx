@@ -178,10 +178,75 @@ function buildHtmlReport(
 
 export default function ReportModal({ onClose, resultHistory, messages }: ReportModalProps) {
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const dateStr = new Date().toLocaleDateString("en-US", {
     year: "numeric", month: "long", day: "numeric",
   });
+
+  const handleDownloadPdf = async () => {
+    setIsGeneratingPdf(true);
+    let container: HTMLDivElement | null = null;
+    try {
+      // Fetch charts as base64 so the off-screen render has no CORS/oklch issues
+      const allChartUrls = resultHistory.flatMap((e) =>
+        e.result.chartUrls.map((u) => `${API_BASE}${u}`)
+      );
+      const uniqueUrls = [...new Set(allChartUrls)];
+      const base64Map: Record<string, string> = {};
+      await Promise.all(
+        uniqueUrls.map(async (url) => {
+          try { base64Map[url] = await fetchAsBase64(url); } catch { /* fall back to URL */ }
+        })
+      );
+
+      // Build the same inline-style HTML used for the HTML download (no Tailwind = no oklch)
+      const html = buildHtmlReport(resultHistory, messages, base64Map, dateStr);
+
+      // Parse and mount in a hidden off-screen div so html2canvas can render it
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+      container = document.createElement("div");
+      container.style.cssText =
+        "position:absolute;left:-9999px;top:0;width:960px;background:#f8fafc;";
+      container.innerHTML = doc.body.innerHTML;
+      document.body.appendChild(container);
+
+      const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+        import("jspdf"),
+        import("html2canvas"),
+      ]);
+
+      // All images are base64 — no CORS needed, no oklch colors in inline styles
+      const canvas = await html2canvas(container, {
+        scale: 2,
+        useCORS: false,
+        allowTaint: true,
+        backgroundColor: "#f8fafc",
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const scaledHeight = pdfWidth * (canvas.height / canvas.width);
+
+      let y = 0;
+      let page = 0;
+      while (y < scaledHeight) {
+        if (page > 0) pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, -y, pdfWidth, scaledHeight);
+        y += pdfHeight;
+        page++;
+      }
+
+      const slug = new Date().toISOString().slice(0, 10);
+      pdf.save(`session-report-${slug}.pdf`);
+    } finally {
+      if (container) document.body.removeChild(container);
+      setIsGeneratingPdf(false);
+    }
+  };
 
   const handleDownload = async () => {
     setIsDownloading(true);
@@ -217,8 +282,6 @@ export default function ReportModal({ onClose, resultHistory, messages }: Report
       setIsDownloading(false);
     }
   };
-
-  const handlePrint = () => window.print();
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 backdrop-blur-sm p-4 pt-8">
@@ -264,15 +327,24 @@ export default function ReportModal({ onClose, resultHistory, messages }: Report
             </button>
 
             <button
-              onClick={handlePrint}
-              className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-400 rounded-lg px-3.5 py-2 transition-colors"
+              onClick={handleDownloadPdf}
+              disabled={isGeneratingPdf}
+              className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-400 rounded-lg px-3.5 py-2 transition-colors disabled:opacity-60"
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="6 9 6 2 18 2 18 9" />
-                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
-                <rect x="6" y="14" width="12" height="8" />
-              </svg>
-              Print
+              {isGeneratingPdf ? (
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-spin">
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                </svg>
+              ) : (
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                  <polyline points="10 9 9 9 8 9" />
+                </svg>
+              )}
+              {isGeneratingPdf ? "Generating…" : "Download PDF"}
             </button>
 
             <button
@@ -378,6 +450,7 @@ export default function ReportModal({ onClose, resultHistory, messages }: Report
                               src={`${API_BASE}${url}`}
                               alt={`Chart ${ci + 1}`}
                               className="w-full md:flex-1 object-contain"
+                              crossOrigin="anonymous"
                             />
                             {inference && (
                               <div className="md:w-64 shrink-0 p-4 bg-gray-50 border-t md:border-t-0 md:border-l border-gray-100 flex flex-col justify-center">

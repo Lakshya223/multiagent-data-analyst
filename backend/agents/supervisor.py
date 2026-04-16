@@ -2,7 +2,7 @@ import os
 import json
 import re
 from langchain_core.messages import HumanMessage, AIMessage
-from backend.config import llm, TABLE_MAP
+from backend.config import llm as _default_llm, TABLE_MAP
 from backend.agents.state import AgentState, RouteDecision
 from backend.agents.context import build_shared_context, MAX_AGENT_CALLS
 from backend.logger import get_logger
@@ -79,6 +79,7 @@ def supervisor_node(state: AgentState) -> dict:
         f'"task": "<specific instruction for the next agent>"}}'
     )
 
+    llm = state.get("llm", _default_llm)
     response = llm.invoke([HumanMessage(content=routing_request)])
 
     # Parse JSON robustly

@@ -2,7 +2,7 @@ import os
 import json
 import re
 from langchain_core.messages import HumanMessage, AIMessage
-from backend.config import llm
+from backend.config import llm as _default_llm
 from backend.agents.state import AgentState
 from backend.agents.context import build_shared_context
 from backend.agents.sql_agent import INFEASIBLE_PREFIX
@@ -25,7 +25,7 @@ def route_hypothesis(state: AgentState):
     return END
 
 
-def _check_sufficiency(user_question: str, sql_summaries: list, eda_inferences: list, shared_context: str) -> dict:
+def _check_sufficiency(user_question: str, sql_summaries: list, eda_inferences: list, shared_context: str, llm=None) -> dict:
     """Ask LLM if available data is sufficient to form hypotheses."""
     context = (
         f"User question: '{user_question}'\n\n"
@@ -36,7 +36,7 @@ def _check_sufficiency(user_question: str, sql_summaries: list, eda_inferences: 
         f"Return ONLY this JSON (no markdown, no explanation):\n"
         f'{{"sufficient": true_or_false, "missing": "description of specific data needed, or null"}}'
     )
-    response = llm.invoke([HumanMessage(content=context)])
+    response = (llm or _default_llm).invoke([HumanMessage(content=context)])
     raw = response.content.strip()
     match = re.search(r'\{.*?\}', raw, re.DOTALL)
     if match:
@@ -51,6 +51,7 @@ def _check_sufficiency(user_question: str, sql_summaries: list, eda_inferences: 
 
 def hypothesis_agent_node(state: AgentState) -> dict:
     log.info("━━━ HYPOTHESIS AGENT ━━━")
+    llm = state.get("llm", _default_llm)
     session_dir = state["session_dir"]
     sql_summaries = state.get("sql_summaries", [])
     eda_inferences = state.get("eda_inferences", [])
@@ -93,7 +94,7 @@ def hypothesis_agent_node(state: AgentState) -> dict:
     # Sufficiency check — skip only if we haven't been force-called by cap
     if not force_finish:
         log.info("Checking data sufficiency...")
-        sufficiency = _check_sufficiency(user_question, real_sql, eda_inferences, shared_context)
+        sufficiency = _check_sufficiency(user_question, real_sql, eda_inferences, shared_context, llm=llm)
         log.info(f"Sufficient: {sufficiency.get('sufficient')} | Missing: {sufficiency.get('missing')}")
 
         if not sufficiency.get("sufficient") and sufficiency.get("missing"):

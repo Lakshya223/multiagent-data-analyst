@@ -1,5 +1,5 @@
 from langchain_core.messages import SystemMessage, AIMessage, HumanMessage
-from backend.config import llm
+from backend.config import llm as _default_llm
 from backend.agents.state import AgentState
 from backend.logger import get_logger
 
@@ -29,6 +29,7 @@ def fallback_node(state: AgentState) -> dict:
         if isinstance(msg, (HumanMessage, AIMessage))
         and not (isinstance(msg, AIMessage) and msg.content.startswith("[Supervisor]"))
     ]
+    llm = state.get("llm", _default_llm)
     messages = [SystemMessage(content=_FALLBACK_PROMPT)] + history_msgs
     response = llm.invoke(messages)
     return {"messages": [AIMessage(content=response.content)]}

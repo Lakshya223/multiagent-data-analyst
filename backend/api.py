@@ -43,6 +43,7 @@ class AnalyzeRequest(BaseModel):
     question: str
     session_id: str | None = None
     history: list[dict] | None = None  # [{"role": "user"|"assistant", "content": str}]
+    model: str = "gemini-2.0-flash"
 
 
 def _parse_findings(report_md: str) -> list[dict]:
@@ -151,10 +152,12 @@ def _extract_summary(report_md: str) -> str:
     return "\n".join(summary_lines).strip()
 
 
-def _generate_direct_answer(question: str, summary: str, findings: list[dict]) -> str:
+def _generate_direct_answer(question: str, summary: str, findings: list[dict], llm=None) -> str:
     """Generate a short, direct conversational answer to the user's question."""
-    from backend.config import llm
     from langchain_core.messages import HumanMessage as HM
+    if llm is None:
+        from backend.config import llm as _default_llm
+        llm = _default_llm
 
     findings_text = "\n".join(
         f"- {f['title']}: {f['body'][:200]}" for f in findings[:4]
@@ -247,6 +250,7 @@ def analyze(req: AnalyzeRequest):
                 history_messages.append(AIMessage(content=content))
         history_messages.append(HumanMessage(content=req.question))
 
+        from backend.config import get_llm
         initial_state = {
             "messages": history_messages,
             # New dynamic fields (defaults)
@@ -255,6 +259,7 @@ def analyze(req: AnalyzeRequest):
             "hypothesis_data_request": "",
             "eda_inferences": [],
             "csv_schemas": [],
+            "llm": get_llm(req.model),
             **session,
         }
 
@@ -304,7 +309,8 @@ def analyze(req: AnalyzeRequest):
             summary = _extract_summary(report_md)
 
         # Generate a direct conversational answer to the user's question
-        answer = _generate_direct_answer(req.question, summary, findings) if (summary or findings) else ""
+        request_llm = initial_state["llm"]
+        answer = _generate_direct_answer(req.question, summary, findings, llm=request_llm) if (summary or findings) else ""
 
         # Fallback: if hypothesis_agent was skipped (no report.md), synthesise an answer
         # directly from EDA inferences and SQL summaries rather than dumping raw agent output
@@ -312,7 +318,7 @@ def analyze(req: AnalyzeRequest):
             sql_summaries = accumulated.get("sql_summaries", [])
             fallback_context = "\n\n".join(filter(None, eda_inferences + sql_summaries))
             if fallback_context:
-                answer = _generate_direct_answer(req.question, fallback_context, [])
+                answer = _generate_direct_answer(req.question, fallback_context, [], llm=request_llm)
         # Last resort: first non-boilerplate AI message (should rarely be reached)
         if not answer:
             skip_prefixes = ("[Supervisor]", "[Hypothesis] Need more data", "EDA complete", "SQL executed")

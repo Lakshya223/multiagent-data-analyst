@@ -25,7 +25,7 @@ export function useAnalysis() {
 
   const selectResult = useCallback((id: string) => setSelectedId(id), []);
 
-  const analyze = useCallback(async (question: string) => {
+  const analyze = useCallback(async (question: string, model: string = "gemini-2.0-flash") => {
     const questionId = randomId();
 
     // Add user message — id matches questionId so we can link result to bubble
@@ -42,7 +42,7 @@ export function useAnalysis() {
       const response = await fetch(`${API_BASE}/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question, history: conversationHistory }),
+        body: JSON.stringify({ question, history: conversationHistory, model }),
       });
 
       if (!response.ok || !response.body) {

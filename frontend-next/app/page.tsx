@@ -173,7 +173,7 @@ export default function Home() {
           <ChatPanel
             messages={messages}
             status={status}
-            onSend={analyze}
+            onSend={(q, m) => analyze(q, m)}
             onSelectResult={selectResult}
             resultIds={resultIds}
             selectedId={selectedId}

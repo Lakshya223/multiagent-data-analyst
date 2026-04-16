@@ -4,7 +4,7 @@ import re
 import json
 import contextlib
 from langchain_core.messages import HumanMessage, AIMessage
-from backend.config import llm
+from backend.config import llm as _default_llm
 from backend.agents.state import AgentState
 from backend.agents.context import build_shared_context
 from backend.logger import get_logger
@@ -124,6 +124,7 @@ def eda_agent_node(state: AgentState) -> dict:
     import matplotlib.pyplot as plt
 
     log.info("━━━ EDA AGENT ━━━")
+    llm = state.get("llm", _default_llm)
     session_dir = state["session_dir"]
     csv_paths = state.get("csv_paths", [])
     latest_csv = csv_paths[-1] if csv_paths else ""

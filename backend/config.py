@@ -20,6 +20,11 @@ vertexai.init(project=BQ_PROJECT, location=VERTEX_LOCATION)
 
 llm = ChatVertexAI(model="gemini-2.0-flash", temperature=0)
 
+
+def get_llm(model: str = "gemini-2.0-flash") -> ChatVertexAI:
+    """Return a ChatVertexAI instance for the requested model."""
+    return ChatVertexAI(model=model, temperature=0)
+
 bq_client = bigquery.Client(project=BQ_PROJECT)
 
 # Table map — all 3 tables available in BigQuery

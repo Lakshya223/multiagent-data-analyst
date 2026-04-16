@@ -2,7 +2,7 @@ import os
 import re
 import json
 from langchain_core.messages import HumanMessage, AIMessage
-from backend.config import llm, bq_client
+from backend.config import llm as _default_llm, bq_client
 from backend.agents.state import AgentState
 from backend.agents.context import build_shared_context
 from backend.logger import get_logger
@@ -24,7 +24,7 @@ def _load_prompt() -> str:
     return template.replace("{schema}", schema)
 
 
-def _check_feasibility(task: str, schema_prompt: str) -> dict:
+def _check_feasibility(task: str, schema_prompt: str, llm=None) -> dict:
     """
     Ask the LLM whether the task can be answered using the available table schemas.
     Returns {"feasible": bool, "reason": str}.
@@ -44,7 +44,7 @@ def _check_feasibility(task: str, schema_prompt: str) -> dict:
         f"Return ONLY this JSON (no markdown, no explanation):\n"
         f'{{"feasible": true_or_false, "reason": "one sentence explaining why or why not"}}'
     )
-    response = llm.invoke([HumanMessage(content=check_prompt)])
+    response = (llm or _default_llm).invoke([HumanMessage(content=check_prompt)])
     raw = response.content.strip()
     match = re.search(r'\{.*?\}', raw, re.DOTALL)
     if match:
@@ -103,6 +103,7 @@ def _run_query(query: str, session_dir: str) -> dict:
 
 def sql_agent_node(state: AgentState) -> dict:
     log.info("━━━ SQL AGENT ━━━")
+    llm = state.get("llm", _default_llm)
     session_dir = state["session_dir"]
 
     # Prefer supervisor's specific task; fall back to original user question
@@ -123,7 +124,7 @@ def sql_agent_node(state: AgentState) -> dict:
 
     # Step 0: Schema feasibility check — bail early if data cannot answer the question
     log.info("Checking schema feasibility...")
-    feasibility = _check_feasibility(effective_task, prompt)
+    feasibility = _check_feasibility(effective_task, prompt, llm=llm)
     log.info(f"Feasible: {feasibility['feasible']} | Reason: {feasibility['reason']}")
 
     if not feasibility["feasible"]:

@@ -14,7 +14,7 @@ export default function UserBubble({
       <div
         onClick={onClick}
         className={[
-          "bg-blue-500 text-white text-sm px-4 py-2 rounded-xl max-w-[78%] leading-relaxed relative",
+          "bg-blue-500 text-white text-[14px] px-4 py-2 rounded-xl max-w-[78%] leading-relaxed relative",
           clickable ? "cursor-pointer hover:brightness-110 transition-[filter]" : "",
           isActive ? "ring-2 ring-white ring-offset-2 ring-offset-blue-500" : "",
         ]

@@ -40,12 +40,12 @@ export default function FindingCard({
     >
       {/* Header row */}
       <div className="flex items-center justify-between gap-2 mb-2">
-        <p className="text-sm font-semibold text-gray-800 leading-snug flex-1">
-          <span className="text-gray-400 font-normal mr-1">{index + 1}.</span>
+        <p className="text-[14px] font-medium text-gray-800 leading-snug flex-1">
+          <span className="text-[12px] text-gray-400 font-normal mr-1">{index + 1}.</span>
           {finding.title.replace(/^\d+\.\s*/, "")}
         </p>
         <span
-          className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${confidenceStyle}`}
+          className={`shrink-0 text-[11px] px-2 py-0.5 rounded-full font-medium ${confidenceStyle}`}
         >
           {finding.confidence}
         </span>
@@ -53,7 +53,7 @@ export default function FindingCard({
 
       {/* Body — clamped when collapsed, full when expanded */}
       <div
-        className={`text-xs text-gray-600 leading-relaxed overflow-hidden transition-all duration-300 [&_h1]:text-xs [&_h2]:text-xs [&_h3]:text-xs [&_h1]:font-semibold [&_h2]:font-semibold [&_h3]:font-semibold ${
+        className={`text-[13px] text-gray-600 leading-[1.6] overflow-hidden transition-all duration-300 [&_h1]:text-[13px] [&_h2]:text-[13px] [&_h3]:text-[13px] [&_h1]:font-semibold [&_h2]:font-semibold [&_h3]:font-semibold ${
           !expanded && long ? "max-h-36" : "max-h-[9999px]"
         }`}
       >

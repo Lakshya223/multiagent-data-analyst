@@ -15,7 +15,7 @@ export default function AssistantCard({ message }: { message: ChatMessage }) {
       <div className="bg-gray-100 rounded-2xl px-4 py-3 max-w-[90%]">
         {badge && (
           <span
-            className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full mb-2 ${badge.className}`}
+            className={`inline-block text-[11px] font-medium px-2 py-0.5 rounded-full mb-2 ${badge.className}`}
           >
             {badge.label}
           </span>

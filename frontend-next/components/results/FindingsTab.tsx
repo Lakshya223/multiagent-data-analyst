@@ -5,7 +5,7 @@ import MarkdownText from "@/components/ui/MarkdownText";
 function SectionHeading({ label }: { label: string }) {
   return (
     <div className="mt-6 mb-3 first:mt-0">
-      <p className="text-sm font-bold text-gray-900 mb-2">{label}</p>
+      <p className="text-[16px] font-medium text-gray-900 mb-2">{label}</p>
       <hr className="border-gray-300" />
     </div>
   );
@@ -36,10 +36,10 @@ export default function FindingsTab({
       {/* Summary */}
       {summary && (
         <div className="bg-indigo-50 border border-indigo-100 rounded-xl px-5 py-7 mb-5">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-indigo-400 mb-3">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-indigo-400 mb-3">
             Summary
           </p>
-          <div className="text-sm text-gray-700 leading-relaxed">
+          <div className="text-[14px] text-gray-700 leading-[1.65]">
             <MarkdownText text={summary} />
           </div>
         </div>

@@ -48,7 +48,7 @@ export default function ChatInput({
           onKeyDown={handleKey}
           placeholder="Ask anything about your retail data..."
           disabled={isLoading}
-          className="flex-1 bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none resize-none overflow-hidden leading-relaxed disabled:opacity-50"
+          className="flex-1 bg-transparent text-[13px] text-gray-700 placeholder-gray-400 outline-none resize-none overflow-hidden leading-relaxed disabled:opacity-50"
           style={{ maxHeight: "9rem" }}
         />
         <button
@@ -65,7 +65,7 @@ export default function ChatInput({
           )}
         </button>
       </div>
-      <p className="text-[10px] text-gray-300 mt-1 pl-1">Shift + Enter for new line</p>
+      <p className="text-[11px] text-gray-300 mt-1 pl-1">Shift + Enter for new line</p>
     </div>
   );
 }

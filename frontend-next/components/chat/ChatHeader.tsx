@@ -19,8 +19,8 @@ export default function ChatHeader() {
         </svg>
       </div>
       <div>
-        <p className="text-sm font-semibold text-gray-900 leading-none">Lens</p>
-        <p className="text-xs text-gray-400 mt-0.5">Retail Intelligence</p>
+        <p className="text-[15px] font-medium text-gray-900 leading-none">Lens</p>
+        <p className="text-[12px] text-gray-400 mt-0.5">Retail Intelligence</p>
       </div>
     </div>
   );

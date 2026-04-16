@@ -10,6 +10,8 @@ body {
   background: var(--bg-app);
   color: #111827;
   font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
   height: 100vh;
   overflow: hidden;
 }

@@ -24,7 +24,7 @@ export default function TabBar({
           <button
             key={t.id}
             onClick={() => onChange(t.id)}
-            className={`mr-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+            className={`mr-6 py-3 text-[14px] font-medium border-b-2 transition-colors ${
               active === t.id
                 ? "border-blue-500 text-gray-900"
                 : "border-transparent text-gray-400 hover:text-gray-600"

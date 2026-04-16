@@ -15,7 +15,7 @@ export default function SuggestionChips({
           key={q}
           onClick={() => onSelect(q)}
           disabled={disabled}
-          className="shrink-0 text-xs text-gray-500 border border-gray-200 rounded-full px-3 py-1.5 hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="shrink-0 text-[12px] text-gray-500 border border-gray-200 rounded-full px-3 py-1.5 hover:bg-gray-50 hover:border-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {q}
         </button>

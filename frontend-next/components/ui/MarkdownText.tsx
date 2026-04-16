@@ -72,7 +72,7 @@ function renderTable(rows: string[]): React.ReactNode {
 // Processes the full text line by line and returns a list of React block elements.
 // compact=true → uniform text-xs sizing (for use inside small cards)
 export function parseMarkdown(text: string, compact = false): React.ReactNode[] {
-  const prose = compact ? "text-xs text-gray-600" : "text-sm text-gray-700";
+  const prose = compact ? "text-[13px] text-gray-600" : "text-[14px] text-gray-700";
   const lines = text.split("\n");
   const nodes: React.ReactNode[] = [];
   let i = 0;
@@ -90,7 +90,7 @@ export function parseMarkdown(text: string, compact = false): React.ReactNode[] 
     const h3 = line.match(/^###\s+(.*)/);
     if (h3) {
       nodes.push(
-        <h3 key={i} className={`${compact ? "text-xs" : "text-sm"} font-bold text-gray-800 mt-3 mb-1`}>
+        <h3 key={i} className={`${compact ? "text-[13px]" : "text-[14px]"} font-bold text-gray-800 mt-3 mb-1`}>
           {renderInline(h3[1])}
         </h3>
       );
@@ -100,7 +100,7 @@ export function parseMarkdown(text: string, compact = false): React.ReactNode[] 
     const h2 = line.match(/^##\s+(.*)/);
     if (h2) {
       nodes.push(
-        <h2 key={i} className={`${compact ? "text-sm" : "text-base"} font-bold text-gray-900 mt-3 mb-1`}>
+        <h2 key={i} className={`${compact ? "text-[14px]" : "text-[15px]"} font-bold text-gray-900 mt-3 mb-1`}>
           {renderInline(h2[1])}
         </h2>
       );
@@ -110,7 +110,7 @@ export function parseMarkdown(text: string, compact = false): React.ReactNode[] 
     const h1 = line.match(/^#\s+(.*)/);
     if (h1) {
       nodes.push(
-        <h1 key={i} className={`${compact ? "text-sm" : "text-lg"} font-bold text-gray-900 mt-3 mb-1`}>
+        <h1 key={i} className={`${compact ? "text-[15px]" : "text-[17px]"} font-bold text-gray-900 mt-3 mb-1`}>
           {renderInline(h1[1])}
         </h1>
       );

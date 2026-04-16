@@ -9,6 +9,7 @@ export interface Finding {
   title: string
   body: string
   confidence: 'High' | 'Medium' | 'Low'
+  section?: 'hypothesis' | 'recommendation' | 'other'
 }
 
 export interface TableData {

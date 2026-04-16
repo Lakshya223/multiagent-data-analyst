@@ -96,7 +96,7 @@ def _parse_findings(report_md: str) -> list[dict]:
 
                 body = "\n".join(body_lines).strip()
                 if title and body:
-                    findings.append({"title": title, "body": body, "confidence": confidence})
+                    findings.append({"title": title, "body": body, "confidence": confidence, "section": _section_type(section_title)})
                 if len(findings) >= 8:
                     return findings
         else:
@@ -116,11 +116,21 @@ def _parse_findings(report_md: str) -> list[dict]:
 
             body = "\n".join(body_lines).strip()
             if section_title and body:
-                findings.append({"title": section_title, "body": body, "confidence": confidence})
+                findings.append({"title": section_title, "body": body, "confidence": confidence, "section": _section_type(section_title)})
             if len(findings) >= 8:
                 return findings
 
     return findings
+
+
+def _section_type(section_title: str) -> str:
+    """Map a ## section title to a normalised section key."""
+    t = section_title.lower()
+    if "hypothes" in t:
+        return "hypothesis"
+    if "recommend" in t:
+        return "recommendation"
+    return "other"
 
 
 def _extract_summary(report_md: str) -> str:

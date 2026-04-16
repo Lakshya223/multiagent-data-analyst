@@ -54,6 +54,7 @@ export default function ResultsPanel({
         <AnalysisTab
           chartUrls={result.chartUrls}
           chartInferences={result.chartInferences}
+          edaInferences={result.edaInferences}
         />
       )}
       {activeTab === "data" && (

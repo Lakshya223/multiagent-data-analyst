@@ -14,9 +14,14 @@ INFEASIBLE_PREFIX = "INFEASIBLE:"
 
 
 def _load_prompt() -> str:
-    prompt_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "prompts", "sql_agent.txt")
+    base_dir = os.path.dirname(os.path.dirname(__file__))
+    prompt_path = os.path.join(base_dir, "prompts", "sql_agent.txt")
+    schema_path = os.path.join(base_dir, "docs", "schema.txt")
     with open(prompt_path, encoding="utf-8") as f:
-        return f.read()
+        template = f.read()
+    with open(schema_path, encoding="utf-8") as f:
+        schema = f.read()
+    return template.replace("{schema}", schema)
 
 
 def _check_feasibility(task: str, schema_prompt: str) -> dict:

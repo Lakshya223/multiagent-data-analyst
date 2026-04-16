@@ -187,6 +187,38 @@ export function parseMarkdown(text: string, compact = false): React.ReactNode[] 
       continue;
     }
 
+    // ── Metadata label pattern: "Label:* value" (e.g. "Supporting Evidence:* ...")
+    const metaMatch = line.match(/^(.+?):\*\s+(.*)/);
+    if (metaMatch) {
+      const label = metaMatch[1];
+      const value = metaMatch[2].trim();
+      const isConfidence = ["High", "Medium", "Low"].includes(value);
+      nodes.push(
+        <div key={i} className="flex items-center flex-wrap gap-1.5 my-1">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">
+            {label}
+          </span>
+          {isConfidence ? (
+            <span
+              className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                value === "High"
+                  ? "bg-green-50 text-green-700"
+                  : value === "Medium"
+                  ? "bg-amber-50 text-amber-700"
+                  : "bg-gray-100 text-gray-500"
+              }`}
+            >
+              {value}
+            </span>
+          ) : (
+            <span className={`${prose} leading-relaxed`}>{renderInline(value)}</span>
+          )}
+        </div>
+      );
+      i++;
+      continue;
+    }
+
     // ── Default: paragraph
     nodes.push(
       <p key={i} className={`${prose} leading-relaxed`}>

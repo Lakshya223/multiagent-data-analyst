@@ -30,12 +30,32 @@ def _extract_code_block(text: str) -> str | None:
     return None
 
 
+_PROCESS_PHRASES = re.compile(
+    r"(the analysis (has |have )?(produced|created|generated|already)|"
+    r"no more charts? (can be|will be|are)|"
+    r"chart(s)? (have been|has been|were|was) (produced|created|saved|generated)|"
+    r"(as |as is )?(shown|illustrated|displayed|visible) in (the )?(chart|plot|graph|figure)|"
+    r"the (plot|chart|graph|figure) (shows|reveals|displays|illustrates)|"
+    r"(looking at|from) the (chart|plot|graph|figure)|"
+    r"i (have|'ve) (produced|created|generated|plotted|made) \d+|"
+    r"(since|because|as) (we|i) (have|'ve) (reached|hit|produced|created) (the )?(limit|maximum|cap|\d+ chart))",
+    re.IGNORECASE,
+)
+
+def _strip_process_sentences(text: str) -> str:
+    """Remove sentences that mention internal analysis process details."""
+    sentences = re.split(r"(?<=[.!?])\s+", text.strip())
+    clean = [s for s in sentences if not _PROCESS_PHRASES.search(s)]
+    return " ".join(clean).strip()
+
+
 def _extract_narrative(text: str) -> str:
     """Strip code blocks and done-JSON, return the remaining narrative text."""
     cleaned = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
     cleaned = re.sub(r'\{[^{}]*"done"[^{}]*\}', "", cleaned)
     lines = [l.strip() for l in cleaned.split("\n") if l.strip()]
-    return " ".join(lines)
+    narrative = " ".join(lines)
+    return _strip_process_sentences(narrative)
 
 
 def _is_done(text: str) -> bool:
@@ -215,6 +235,54 @@ def eda_agent_node(state: AgentState) -> dict:
     if final_narrative:
         eda_inferences.append(final_narrative)
 
+    # ── Per-chart inferences ────────────────────────────────────────────────
+    # One focused LLM call produces a 1-2 sentence insight for each chart
+    # produced this round. Falls back to the overall narrative on any failure.
+    chart_inferences = list(state.get("chart_inferences", []))
+    round_chart_entries = [e for e in step_log if e.get("chart")]
+
+    if round_chart_entries:
+        if final_narrative:
+            chart_desc_parts = []
+            for entry in round_chart_entries:
+                chart_name = os.path.basename(entry["chart"])
+                code_preview = (entry["code"] or "")[:300]
+                out_preview  = (entry.get("output") or "")[:120]
+                chart_desc_parts.append(
+                    f'"{chart_name}": code={code_preview!r} | output={out_preview!r}'
+                )
+
+            per_chart_prompt = (
+                "You are a data analyst. You just finished an analysis and produced the charts listed below.\n"
+                "For each chart, write exactly 1-2 sentences describing the specific, concrete insight "
+                "that chart reveals (mention actual values, trends, or comparisons).\n\n"
+                f"Overall analysis summary:\n{final_narrative[:800]}\n\n"
+                "Charts produced:\n" + "\n".join(chart_desc_parts) + "\n\n"
+                "Return ONLY a JSON array — no markdown fences, no explanation:\n"
+                '[{"chart":"chart_1.png","insight":"..."},{"chart":"chart_2.png","insight":"..."}]'
+            )
+            try:
+                resp = llm.invoke([HumanMessage(content=per_chart_prompt)])
+                raw = resp.content.strip()
+                raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw, flags=re.MULTILINE).strip()
+                items = json.loads(raw)
+                name_to_insight = {
+                    item["chart"]: item["insight"]
+                    for item in items
+                    if isinstance(item, dict) and "chart" in item and "insight" in item
+                }
+                for entry in round_chart_entries:
+                    name = os.path.basename(entry["chart"])
+                    chart_inferences.append(name_to_insight.get(name, final_narrative))
+                log.info(f"Per-chart inferences generated for {len(round_chart_entries)} chart(s)")
+            except Exception as exc:
+                log.warning(f"Per-chart inference generation failed: {exc} — using overall narrative")
+                for _ in round_chart_entries:
+                    chart_inferences.append(final_narrative)
+        else:
+            for _ in round_chart_entries:
+                chart_inferences.append("")
+
     eda_results = {
         "chart_paths": chart_paths,
         "key_findings": eda_inferences,
@@ -233,4 +301,5 @@ def eda_agent_node(state: AgentState) -> dict:
         "eda_results": eda_results,
         "eda_code": eda_code,
         "eda_inferences": eda_inferences,
+        "chart_inferences": chart_inferences,
     }

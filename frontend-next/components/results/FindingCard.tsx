@@ -39,9 +39,10 @@ export default function FindingCard({
       className={`bg-white rounded-xl p-4 border-l-4 shadow-sm mb-3 ${borderColor}`}
     >
       {/* Header row */}
-      <div className="flex items-start justify-between gap-2 mb-2">
+      <div className="flex items-center justify-between gap-2 mb-2">
         <p className="text-sm font-semibold text-gray-800 leading-snug flex-1">
-          {finding.title}
+          <span className="text-gray-400 font-normal mr-1">{index + 1}.</span>
+          {finding.title.replace(/^\d+\.\s*/, "")}
         </p>
         <span
           className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${confidenceStyle}`}
@@ -52,7 +53,7 @@ export default function FindingCard({
 
       {/* Body — clamped when collapsed, full when expanded */}
       <div
-        className={`text-xs text-gray-600 leading-relaxed overflow-hidden transition-all duration-300 ${
+        className={`text-xs text-gray-600 leading-relaxed overflow-hidden transition-all duration-300 [&_h1]:text-xs [&_h2]:text-xs [&_h3]:text-xs [&_h1]:font-semibold [&_h2]:font-semibold [&_h3]:font-semibold ${
           !expanded && long ? "max-h-36" : "max-h-[9999px]"
         }`}
       >
@@ -63,7 +64,7 @@ export default function FindingCard({
       {long && (
         <button
           onClick={() => setExpanded((p) => !p)}
-          className="mt-1.5 text-[11px] font-medium text-indigo-500 hover:text-indigo-700 transition-colors"
+          className="mt-2 inline-flex items-center gap-1 px-3 py-1 text-[11px] font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-full hover:bg-indigo-100 hover:border-indigo-300 transition-colors"
         >
           {expanded ? "Show less ↑" : "Show more ↓"}
         </button>

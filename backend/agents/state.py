@@ -15,6 +15,7 @@ class AgentState(TypedDict):
     csv_schemas: list[dict]         # per-CSV metadata: {filename, columns, dtypes, row_count}
     eda_code: list[str]             # code blocks executed by EDA Agent
     eda_inferences: list[str]       # per-round EDA narrative texts (accumulates)
+    chart_inferences: list[str]     # per-chart insight strings, parallel to chart_paths
     iteration: int                  # legacy refinement counter
     agent_call_count: int           # supervisor increments on every routing decision (cap: 8)
     supervisor_task: str            # specific instruction from supervisor to next agent

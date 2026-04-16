@@ -1,0 +1,187 @@
+AVAILABLE TABLES
+
+
+1. transactions: `lakshya-agenticai.retail.transaction_data`
+
+   Column                  Type        Description
+   ──────────────────────────────────────────────────────────────────────────────
+   AMPERITY_ID             STRING      Unique customer identifier in UUID format (e.g. 4278f91d-44ba-3669…)
+   DATASOURCE              STRING      Source system the transaction came from (e.g. CDT_POS_UIT = point of sale)
+   ORDER_ID                STRING      Unique hashed identifier for the order
+   ORDER_DATETIME          TIMESTAMP   Date and time the order was placed (UTC)
+   PRODUCT_ID              INTEGER     Numeric identifier for the product purchased
+   ITEM_QUANTITY           INTEGER     Number of units of the product in this line item
+   IS_RETURN               BOOLEAN     TRUE if this line item was returned
+   IS_CANCELLATION         BOOLEAN     TRUE if this line item was cancelled
+   ITEM_REVENUE            FLOAT       Actual revenue collected for this line item after discounts
+   ITEM_COST               FLOAT       Cost of goods for this line item (0.0 in sample for some records)
+   ITEM_PROFIT             FLOAT       Profit on this line item (ITEM_REVENUE − ITEM_COST)
+   ITEM_LIST_PRICE         FLOAT       Original listed price before any discounts
+   ITEM_DISCOUNT_AMOUNT    FLOAT       Absolute discount amount applied to this line item
+   ITEM_DISCOUNT_PERCENT   FLOAT       Discount percentage applied (e.g. 0.402 = 40.2%)
+   ITEM_DISCOUNT_CODE      STRING      Discount or promo code applied (null if no discount used)
+   PRICE_TAX               FLOAT       Tax amount applied to this line item
+   LINE_NO                 FLOAT       Line number within the order (position of item in the order)
+   CURRENCY                STRING      Currency of the transaction (e.g. USD)
+   PAYMENT_METHOD          STRING      Payment method used (e.g. MASTERCARD, VISA, DEBIT CARD, AMERICAN EXPRESS)
+   PAYMENT_REFERENCE2      STRING      Secondary payment reference identifier (null in sample)
+   PURCHASE_CHANNEL        STRING      Channel through which the purchase was made (e.g. SOF = Saks OFF 5TH — probe before filtering)
+   PURCHASE_BRAND          STRING      Brand banner where purchase was made (e.g. SAKSOFFFIFTH, SOF)
+   DELIVERY_METHOD         STRING      How the order was fulfilled (e.g. ship, pickup — null in sample, probe before filtering)
+   DIGITAL_CHANNEL         STRING      Digital sub-channel if order placed online (null in sample)
+   ORDER_STATUS            STRING      Current status of the order (null in sample — probe before filtering)
+   STORE_ID                INTEGER     Numeric identifier for the physical store
+   STORE_NAME              STRING      Name of the store location (e.g. ANAHEIM O5, EASTCHESTER O5)
+   LOYALTY_ID              STRING      Customer's loyalty program membership ID (null if not a loyalty member)
+   CUSTOMER_ID             STRING      Hashed internal customer identifier (STRING, not INTEGER)
+   AMPERITY_ID             STRING      Unique customer identifier in UUID format
+   EMP_INDICATOR           BOOLEAN     TRUE if the transaction was made by an employee
+   IS_INTERNATIONAL        STRING      Whether the order is international (STRING not BOOLEAN — probe values before filtering)
+   PRODUCT_BRAND           STRING      Brand of the product (null in sample — probe before filtering)
+   PRODUCT_CATEGORY        STRING      High-level product category (e.g. MEN'S, WOMENS — null in sample, probe before filtering)
+   PRODUCT_CLASS           STRING      Product classification within category (null in sample)
+   PRODUCT_COLOR           STRING      Color of the product (null in sample)
+   PRODUCT_DEPARTMENT      STRING      Department the product belongs to (null in sample)
+   PRODUCT_DESCRIPTION     STRING      Text description of the product (null in sample)
+   PRODUCT_DIVISION        STRING      Division-level grouping above department (null in sample)
+   PRODUCT_GENDER          STRING      Gender the product is targeted at (e.g. mens, womens — probe before filtering)
+   PRODUCT_GROUP           STRING      Sub-grouping within product class (null in sample)
+   PRODUCT_PARENT_ID       INTEGER     Parent product ID for variant grouping (e.g. all sizes/colors of same style)
+   PRODUCT_SIZE            STRING      Size of the product (null in sample)
+   PRODUCT_SIZE1_DESC      STRING      Primary size description (null in sample)
+   PRODUCT_SIZE2_DESC      STRING      Secondary size description, e.g. waist/length (null in sample)
+   PRODUCT_SKN             INTEGER     SKN (style-color) level product identifier
+   PRODUCT_UPC             INTEGER     Universal Product Code barcode identifier
+   ASSRT_LAYER1            STRING      Broadest assortment hierarchy level (null in sample — probe before use)
+   ASSRT_LAYER2            STRING      Second level of assortment hierarchy (null in sample)
+   ASSRT_LAYER3            STRING      Third level of assortment hierarchy (null in sample)
+   ASSRT_LAYER4            STRING      Most granular assortment hierarchy level (null in sample)
+   UNIT_COST               FLOAT       Cost per individual unit of the product
+   SOURCE_ORDER_ID         STRING      Original order ID from the source system before hashing
+   INTERACTION_ID          STRING      Unique identifier for the transaction interaction event
+   FK_STORE_TXN            STRING      Foreign key linking to store transaction record
+   FK_WEB_TXN              FLOAT       Foreign key linking to web transaction record (null for in-store)
+   PK                      STRING      Composite primary key combining store, product, interaction, and date fields
+
+   Notes:
+   • Revenue for a line item = ITEM_QUANTITY * ITEM_REVENUE (never use ITEM_REVENUE alone)
+   • Many columns are null in sample data — always probe with SELECT DISTINCT or IS NOT NULL before filtering
+   • IS_INTERNATIONAL is STRING, not BOOLEAN — check actual values before using in WHERE clause
+   • LOYALTY_ID is null for non-loyalty customers; use IS NOT NULL / IS NULL to segment loyalty vs non-loyalty
+
+
+2. clickstream: `lakshya-agenticai.retail.clickstream_session_data`
+
+   Column                       Type        Description
+   ──────────────────────────────────────────────────────────────────────────────
+   SESSION_UUID                 STRING      Unique identifier for each browsing session
+   VISITOR_DEVICE_UUID          STRING      Unique identifier for the visitor's device
+   DATE_FILTER                  TIMESTAMP   Date of the session (truncated to midnight UTC)
+   SESSION_TIMESTAMP_NY         TIMESTAMP   Exact session start time in New York timezone
+   CUSTOMER_ID                  INTEGER     Internal customer ID (-1 if visitor is anonymous/unidentified)
+   ACCOUNT_ID                   INTEGER     Logged-in customer account ID (null if anonymous)
+   EMAIL_ADDRESS_USED           STRING      Email address associated with session if identified (null if anonymous)
+   LOGGED_ON                    STRING      Login status of visitor (e.g. anonymous, logged-in)
+   LANGUAGE                     STRING      Browser language setting (e.g. English (United States))
+   IP                           STRING      IP address of the visitor
+   REF_DOMAIN                   STRING      Referring domain that drove the session (e.g. facebook.com)
+   LANDING_PAGE_URL             STRING      Full URL of the page where session began (includes product URLs and UTM params)
+   VISIT_NUM                    INTEGER     Visit number for this visitor (1 = first visit)
+   LOCATION_ID                  STRING      Internal location identifier (null in sample)
+   LOCATION_UUID                STRING      UUID version of the location identifier
+   USER_AGENT_ID                INTEGER     Numeric ID representing the browser/device user agent
+   DEVICE_TYPE                  STRING      Category of device used (e.g. computer, mobile, tablet)
+   OPERATING_SYSTEM             STRING      OS of the visitor's device (e.g. windows, iOS, android)
+   BROWSER_NAME                 STRING      Browser used during session (e.g. chrome, safari)
+   CART_FLAG                    INTEGER     1 if visitor added item to cart during session, 0 otherwise
+   CHECKOUT_FLAG                INTEGER     1 if visitor reached checkout during session, 0 otherwise
+   ORDER_FLAG                   INTEGER     1 if visitor completed a purchase during session, 0 otherwise
+   SESSION_ATTRIBUTION_CHANNEL  STRING      Marketing channel that gets credit for session (e.g. social media organic, email, paid search)
+   SESSION_ATTRIBUTION_CAMPAIGN STRING      Campaign name attributed to the session (e.g. Organic Social)
+   IS_IN_APP_FLAG               BOOLEAN     TRUE if session originated from within the mobile app
+   IS_SFCC                      BOOLEAN     TRUE if session is on the Salesforce Commerce Cloud platform
+   AB_TEST                      STRING      A/B test variant assigned to this session (null if no test)
+   MOBILE_APP_ID                STRING      Mobile application identifier (null for non-app sessions)
+   MOBILE_LAUNCH_NUMBER         STRING      App launch sequence number for mobile sessions (null for non-app)
+   DW_CREATED_AT                TIMESTAMP   Timestamp when record was first written to data warehouse
+   DW_UPDATED_AT                TIMESTAMP   Timestamp when record was last updated in data warehouse
+
+   Notes:
+   • CART_FLAG, CHECKOUT_FLAG, ORDER_FLAG are INTEGER (0 or 1) — use SUM(CART_FLAG) or AVG(CART_FLAG), NOT = TRUE
+   • CUSTOMER_ID = -1 means anonymous visitor; filter with CUSTOMER_ID > 0 for identified users only
+   • Funnel conversion: cart → checkout → order (each is a subset of the previous)
+
+
+3. email: `lakshya-agenticai.retail.email_data`
+
+   Column                      Type        Description
+   ──────────────────────────────────────────────────────────────────────────────
+   SUBSCRIBERKEY               STRING      Subscriber's email address used as unique key
+   EMAILADDRESS                STRING      Recipient email address (mirrors SUBSCRIBERKEY)
+   SUBSCRIBERID                INTEGER     Numeric internal subscriber ID
+   CLIENTID                    INTEGER     Client/account ID (same across all rows: 546008628)
+   SENDID                      INTEGER     Unique ID for each email send/blast
+   LISTID                      INTEGER     Mailing list ID the subscriber belongs to
+   BATCHID                     INTEGER     Batch number within a send job
+   TRIGGEREDSENDEXTERNALKEY    INTEGER     External key for triggered sends (null in sample)
+   REFID                       STRING      Full reference string encoding campaign metadata
+   PUB_WEEK                    STRING      Publication week number (e.g. 1, 2)
+   PUB_DATE                    INTEGER     Publication date in MMDDYY format (e.g. 20925 = Feb 9 2025)
+   CAMPAIGN                    STRING      Campaign name/code (e.g. CYBERSUNDAYCYR, FENDIBRANDPULSE)
+   REF_CONTENT                 STRING      Content reference tag extracted from REFID
+   REF_CATEGORY                STRING      Category code for the campaign (e.g. FOB, DRES, WM, WMCC)
+   REF_FRANCHISE               STRING      Franchise/brand focus code (e.g. FRCYRS, BRNA, CTNA)
+   REF_SEGMENT                 STRING      Audience segment targeted (e.g. MCRO, FULLNP, FULL)
+   REF_TEST                    STRING      A/B test variant identifier (NA = no test)
+   REF_MSG_TYPE                STRING      Message type classification (e.g. PROM = promotional)
+   REF_VENDOR                  STRING      Sending vendor platform (e.g. SFMC = Salesforce Marketing Cloud)
+   REF_LOYALTY                 STRING      Loyalty tier targeted (e.g. NLOY = non-loyalty)
+   SUBJECT                     STRING      Email subject line shown to recipient
+   SUBJ_LEN                    INTEGER     Character length of the subject line
+   SUB_WORD_COUNT              INTEGER     Word count of the subject line
+   FROMNAME                    STRING      Sender display name (e.g. Saks OFF 5TH)
+   FROMEMAIL                   STRING      Sender email address
+   SJ_JOBSTATUS                STRING      Send job status (e.g. Complete)
+   SENT_TIME                   TIMESTAMP   UTC timestamp when email was sent
+   IS_OPEN                     BOOLEAN     TRUE if recipient opened the email
+   OPEN_TIME                   TIMESTAMP   UTC timestamp of first/recorded open
+   OPEN_ISUNIQUE               BOOLEAN     TRUE if this is the subscriber's unique/first open
+   OPEN_BROWSER                STRING      Browser used at time of open (e.g. Android, Safari)
+   OPEN_EMAILCLIENT            STRING      Email client used to open (e.g. Android, iPhone)
+   OPEN_OS                     STRING      Operating system at open (e.g. Android, iOS, Windows)
+   OPEN_DEVICE                 STRING      Device type at open (e.g. Unspecified, iPhone, PC)
+   IS_CLICK                    BOOLEAN     TRUE if recipient clicked a link in the email
+   CLICK_TIME                  TIMESTAMP   UTC timestamp of the click event
+   CLICK_URL                   STRING      Full URL of the link that was clicked
+   CLICK_ALIAS                 STRING      Human-readable alias/label for clicked link (e.g. ALG_6_BAU-6, Contact_Us_footer)
+   CLICK_REFID                 STRING      Reference ID tag associated with the clicked link
+   CLICK_URLID                 INTEGER     Internal numeric ID of the clicked URL
+   CLICK_SENDURLID             INTEGER     Send-level URL ID for the clicked link
+   CLICK_IS_UNIQUE             BOOLEAN     TRUE if this is the subscriber's first click on this URL
+   CLICK_BROWSER               STRING      Browser used at time of click
+   CLICK_EMAILCLIENT           STRING      Email client used at time of click
+   CLICK_OS                    STRING      Operating system at time of click
+   CLICK_DEVICE                STRING      Device type at time of click
+   IS_BOUNCE                   BOOLEAN     TRUE if email bounced (hard or soft)
+   BOUNCE_TIME                 STRING      Timestamp of bounce event (null if no bounce)
+   BOUNCE_CATEGORY             STRING      Bounce category classification (null if no bounce)
+   BOUNCE_SMTPCODE             STRING      SMTP error code from bounce (null if no bounce)
+   BOUNCE_REASON               STRING      Bounce reason description (null if no bounce)
+   IS_UNSUB                    BOOLEAN     TRUE if recipient unsubscribed after this send
+   UNSUB_TIME                  STRING      Timestamp of unsubscribe event (null if not unsubscribed)
+   UNSUB_REASON                STRING      Reason provided for unsubscribing (null if not unsubscribed)
+
+   Notes:
+   • IS_OPEN, IS_CLICK, IS_BOUNCE, IS_UNSUB are BOOLEAN — use COUNTIF(IS_OPEN) or SUM(CAST(IS_OPEN AS INT64)) to aggregate; do NOT use SUM(IS_OPEN) directly
+   • One row per subscriber per send — a subscriber can appear multiple times across campaigns
+   • REF_LOYALTY values identify loyalty vs non-loyalty audience targeting (e.g. NLOY = non-loyalty)
+
+
+JOIN KEYS
+
+
+These three tables do NOT share a common join key and should be queried independently.
+  • AMPERITY_ID    → UUID format (transactions only)
+  • SUBSCRIBERKEY  → email-address format (email only)
+  • CUSTOMER_ID    → INTEGER in clickstream (STRING in transactions — different systems)
+Cross-table JOINs will return 0 rows. Analyse each table on its own.

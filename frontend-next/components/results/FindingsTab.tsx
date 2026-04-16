@@ -21,7 +21,7 @@ export default function FindingsTab({
     <div className="flex-1 overflow-y-auto thin-scroll p-6">
       {/* Summary section */}
       {summary && (
-        <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-5 mb-5">
+        <div className="bg-indigo-50 border border-indigo-100 rounded-xl px-5 py-7 mb-5">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-indigo-400 mb-3">
             Summary
           </p>

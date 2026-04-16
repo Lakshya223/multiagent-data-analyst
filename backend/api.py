@@ -42,6 +42,7 @@ os.makedirs(SESSIONS_DIR, exist_ok=True)
 class AnalyzeRequest(BaseModel):
     question: str
     session_id: str | None = None
+    history: list[dict] | None = None  # [{"role": "user"|"assistant", "content": str}]
 
 
 def _parse_findings(report_md: str) -> list[dict]:
@@ -235,8 +236,19 @@ def analyze(req: AnalyzeRequest):
         session_id = session["session_id"]
         log.info(f"NEW REQUEST | session={session_id} | question={req.question!r}")
 
+        # Build message list: inject prior conversation turns then the new question
+        history_messages = []
+        for h in (req.history or []):
+            role = h.get("role", "")
+            content = h.get("content", "")
+            if role == "user":
+                history_messages.append(HumanMessage(content=content))
+            elif role == "assistant":
+                history_messages.append(AIMessage(content=content))
+        history_messages.append(HumanMessage(content=req.question))
+
         initial_state = {
-            "messages": [HumanMessage(content=req.question)],
+            "messages": history_messages,
             # New dynamic fields (defaults)
             "supervisor_task": "",
             "agent_call_count": 0,

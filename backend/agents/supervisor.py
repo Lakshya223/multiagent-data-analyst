@@ -47,10 +47,11 @@ def supervisor_node(state: AgentState) -> dict:
             "hypothesis_data_request": "",
         }
 
-    # Capture user question on first pass
+    # Capture user question on first pass — always use the LAST HumanMessage so that
+    # conversation history prepended from prior turns does not override the current question.
     user_question = state.get("user_question", "")
     if not user_question:
-        for msg in state["messages"]:
+        for msg in reversed(state["messages"]):
             if isinstance(msg, HumanMessage) and not msg.content.startswith("[Context]") and not msg.content.startswith("[Supervisor]"):
                 user_question = msg.content
                 break

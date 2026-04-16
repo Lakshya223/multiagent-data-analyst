@@ -13,6 +13,9 @@ export function useAnalysis() {
   const [resultHistory, setResultHistory] = useState<ResultEntry[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [status, setStatus] = useState<AppStatus>({ state: "idle" });
+  const [conversationHistory, setConversationHistory] = useState<
+    { role: string; content: string }[]
+  >([]);
 
   // Derived: the currently-displayed result
   const currentResult = resultHistory.find((e) => e.id === selectedId)?.result ?? null;
@@ -39,7 +42,7 @@ export function useAnalysis() {
       const response = await fetch(`${API_BASE}/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ question, history: conversationHistory }),
       });
 
       if (!response.ok || !response.body) {
@@ -97,6 +100,15 @@ export function useAnalysis() {
             setResultHistory((prev) => [...prev, { id: questionId, result: analysisResult }]);
             setSelectedId(questionId);
 
+            // Append this Q&A turn to conversation context for subsequent requests
+            const assistantSummary =
+              analysisResult.summary || analysisResult.answer || "Analysis complete.";
+            setConversationHistory((prev) => [
+              ...prev,
+              { role: "user", content: question },
+              { role: "assistant", content: assistantSummary },
+            ]);
+
             const assistantMsg: ChatMessage = {
               id: randomId(),
               role: "assistant",
@@ -121,13 +133,14 @@ export function useAnalysis() {
       setMessages((prev) => [...prev, errorMsg]);
       setStatus({ state: "idle" });
     }
-  }, []);
+  }, [conversationHistory]);
 
   const reset = useCallback(() => {
     setMessages([]);
     setResultHistory([]);
     setSelectedId(null);
     setStatus({ state: "idle" });
+    setConversationHistory([]);
   }, []);
 
   return { messages, currentResult, status, analyze, reset, selectResult, resultIds, selectedId };

@@ -44,8 +44,8 @@ export const SUGGESTIONS = [
   "What is the return rate by purchase channel?",
   "Which store has the highest average order value?",
   "How do loyalty vs non-loyalty customers differ?",
-  "Which email campaigns led to the most purchases?",
-  "What discount levels drive the highest return rates?",
+  "Explain day wise add to cart and checkout behavior",
+  "What are the top campaigns sent",
 ]
 
 export const AGENT_LABELS: Record<string, string> = {

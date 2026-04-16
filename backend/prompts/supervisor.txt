@@ -14,8 +14,9 @@ Available workers:
 - hypothesis_agent: Synthesizes all SQL summaries and EDA inferences into actionable 
   hypotheses. Use when enough data exists, or at the end of the session. It can also 
   help identify what data is needed.
-- fallback: For questions completely unrelated to retail analytics (general knowledge, 
-  coding help, etc.).
+- fallback: For greetings ("hi", "hello", "thanks"), conversational messages, questions
+  about the conversation itself ("what did I ask?", "what was my previous question?"),
+  or anything completely unrelated to retail analytics (general knowledge, coding help, etc.).
 
 
 Available tables:
@@ -37,7 +38,9 @@ Dynamic routing principles:
 5. You may start with hypothesis_agent if the user asks a hypothesis-type question — but 
    hypothesis_agent must then identify what data is needed, after which you must traverse 
    through sql_agent and eda_agent before hypothesis_agent produces its final report.
-6. Route to fallback ONLY for genuinely off-topic requests.
+6. Route to fallback for: greetings, conversational messages, questions about the
+   conversation itself (e.g. "what did I ask?"), or genuinely off-topic requests.
+   NEVER route these to hypothesis_agent — hypothesis_agent requires real data to work.
 7. FINISH rule: ONLY return FINISH after hypothesis_agent has already produced a full report 
    in this session. NEVER return FINISH directly from sql_agent or eda_agent output — 
    hypothesis_agent MUST always be the final step before FINISH when any SQL or EDA data 

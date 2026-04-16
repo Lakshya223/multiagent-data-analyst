@@ -3,8 +3,7 @@
 An agentic AI system that autonomously queries a large retail BigQuery dataset, performs statistical analysis and data visualization, and synthesizes evidence-backed hypotheses — all from a single natural-language question.
 
 **Live deployment:**
-- Frontend: https://retail-frontend-985676490491.us-central1.run.app
-- Backend API: https://retail-backend-985676490491.us-central1.run.app
+- Live URL: https://retail-frontend-985676490491.us-central1.run.app
 
 ---
 

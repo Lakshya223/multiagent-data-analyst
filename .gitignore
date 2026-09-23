@@ -1,6 +1,8 @@
 # Environment
 .env
-*.json
+# GCP service-account keys live at the repo root
+/*.json
+.claude/settings.local.json
 
 # Session artifacts
 sessions/

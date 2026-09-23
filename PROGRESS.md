@@ -82,10 +82,6 @@
 - [x] TypeScript types in `types/index.ts`
 - [x] Zero TS errors (`npm run build` clean)
 
-### Frontend — Streamlit (`frontend/app.py`) — kept as fallback
-- [x] Still available at `frontend/app.py`
-- [x] Runs via `venv\Scripts\streamlit run frontend\app.py` on port 8501
-
 ---
 
 ## End-to-End Pipeline Verified ✅
@@ -146,10 +142,6 @@ venv\Scripts\uvicorn backend.api:app --reload --port 8000
 cd frontend-next
 npm run dev
 # → http://localhost:3000
-
-# Alt: Streamlit (original UI, still works)
-venv\Scripts\streamlit run frontend\app.py
-# → http://localhost:8501
 ```
 
 ---
@@ -205,8 +197,6 @@ project-2/
 │   │   └── useAnalysis.ts
 │   └── types/
 │       └── index.ts
-├── frontend/
-│   └── app.py                  # Streamlit UI (kept as fallback)
 ├── sessions/
 ├── .env
 ├── .gitignore
